@@ -1,4 +1,4 @@
-# Tokyo 2025 Olympics Anti-Phishing App
+# Tokyo 2025 Olympics Anti-Phishing App Research Works
 ![Alt text](https://github.com/Pbhacks/KVT/blob/main/assets/background_image.jpg)
 Welcome to the Tokyo 2025 Olympics Anti-Phishing App! This application is designed to help users detect phishing emails and offers features to assist in ensuring online safety, especially during major events like the Tokyo 2025 Olympics.
 
