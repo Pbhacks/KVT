@@ -6,8 +6,12 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.image import Image
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.video import Video
 from plyer import notification
 import joblib
+import re
 
 # Load models and preprocessing objects
 vectorizer = joblib.load('model/vectorizer.pkl')
@@ -16,7 +20,10 @@ models = {
     'RandomForest': joblib.load('model/RandomForest_model.pkl'),
     'GradientBoosting': joblib.load('model/GradientBoosting_model.pkl'),
     'NaiveBayes': joblib.load('model/NaiveBayes_model.pkl'),
-    'SVM': joblib.load('model/SVM_model.pkl')
+    'SVM': joblib.load('model/SVM_model.pkl'),
+    'LogisticRegression': joblib.load('model/LogisticRegression_model.pkl'),
+    'AdaBoost': joblib.load('model/AdaBoost_model.pkl'),
+    'MLP': joblib.load('model/MLP_model.pkl')
 }
 
 class HomeScreen(Screen):
@@ -58,8 +65,13 @@ class GuideScreen(Screen):
         analyze_button.bind(on_press=self.analyze_email)
         layout.add_widget(analyze_button)
         
-        self.result_label = Label(text='', size_hint=(1, 0.2))
+        self.result_label = Label(text='', size_hint=(1, 0.1))
         layout.add_widget(self.result_label)
+        
+        # Anti-phishing playlist button
+        playlist_button = Button(text='Anti - ph playlist', size_hint=(1, 0.1))
+        playlist_button.bind(on_press=self.goto_playlist)
+        layout.add_widget(playlist_button)
         
         back_button = Button(text='Back', size_hint=(1, 0.1))
         back_button.bind(on_press=self.go_back)
@@ -71,14 +83,25 @@ class GuideScreen(Screen):
         email_content = self.email_input.text
         features = vectorizer.transform([email_content])
         
-        model = models['RandomForest']  # Set your default model
+        # Select model for prediction (for simplicity, using RandomForest here)
+        model = models['RandomForest']
         prediction = model.predict(features)
         is_phishing = prediction[0] == 1
         
-        if is_phishing:
+        url_phishing = False
+        urls = re.findall(r'(https?://\S+)', email_content)
+        for url in urls:
+            if "phishing" in url:  # Simplified URL check, replace with actual logic
+                url_phishing = True
+                break
+        
+        if is_phishing or url_phishing:
             self.result_label.text = 'This email is likely a phishing attempt!'
         else:
             self.result_label.text = 'This email appears to be safe.'
+    
+    def goto_playlist(self, instance):
+        self.manager.current = 'playlist'
     
     def go_back(self, instance):
         self.manager.current = 'home'
@@ -123,6 +146,41 @@ class SettingsScreen(Screen):
     def go_back(self, instance):
         self.manager.current = 'home'
 
+class AntiPhishingVideosScreen(Screen):
+    def build(self):
+        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        
+        # List of videos (for demonstration purposes, using simple labels and buttons)
+        videos = [
+            {"title": "Understanding Phishing Attacks", "url": "https://youtu.be/XBkzBrXlle0"},
+            {"title": "How to Recognize Phishing Emails", "url": "https://youtu.be/o0btqyGWIQw"}
+        ]
+        
+        scroll_view = ScrollView(size_hint=(1, 1))
+        grid_layout = GridLayout(cols=1, padding=10, spacing=10, size_hint_y=None)
+        grid_layout.bind(minimum_height=grid_layout.setter('height'))
+        
+        for video in videos:
+            video_button = Button(text=video["title"], size_hint_y=None, height=40)
+            video_button.bind(on_press=lambda btn, url=video["url"]: self.open_url(url))
+            grid_layout.add_widget(video_button)
+        
+        scroll_view.add_widget(grid_layout)
+        layout.add_widget(scroll_view)
+        
+        back_button = Button(text='Back', size_hint=(1, 0.1))
+        back_button.bind(on_press=self.go_back)
+        layout.add_widget(back_button)
+        
+        return layout
+    
+    def open_url(self, url):
+        import webbrowser
+        webbrowser.open(url)
+    
+    def go_back(self, instance):
+        self.manager.current = 'guide'
+
 class AntiPhishingApp(App):
     def build(self):
         self.title = 'Anti-Phishing App for Tokyo 2025'
@@ -139,6 +197,10 @@ class AntiPhishingApp(App):
         settings_screen = SettingsScreen(name='settings')
         settings_screen.add_widget(settings_screen.build())
         self.screen_manager.add_widget(settings_screen)
+        
+        playlist_screen = AntiPhishingVideosScreen(name='playlist')
+        playlist_screen.add_widget(playlist_screen.build())
+        self.screen_manager.add_widget(playlist_screen)
         
         return self.screen_manager
 

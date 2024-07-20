@@ -13,7 +13,7 @@ data = pd.read_csv('email_phishing_dataset.csv')
 # Print column names to debug
 print("Columns in dataset:", data.columns)
 
-# Check if 'email_content' and 'label' columns exist
+# Check if required columns exist
 if 'email_content' not in data.columns or 'label' not in data.columns:
     raise ValueError("Dataset must contain 'email_content' and 'label' columns")
 
@@ -31,3 +31,5 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # Save preprocessing objects
 joblib.dump(vectorizer, 'model/vectorizer.pkl')
 joblib.dump((X_train, X_test, y_train, y_test), 'model/train_test_data.pkl')
+
+print("Data preparation complete. Preprocessing objects saved.")

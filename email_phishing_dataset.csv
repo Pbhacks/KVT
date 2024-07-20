@@ -9,3 +9,13 @@ email_content,label
 """Hi, We detected a suspicious login attempt to your account from an unknown device. If this was not you, please reset your password immediately to secure your account. Click here to reset your password: http://fakesocialmedia.com/reset If you do not take action, your account may be at risk. Best, The Security Team""",1
 """Dear Customer, Thank you for your recent purchase. We need to verify your payment information to process your order. Please confirm your payment details by clicking the link below: http://fakeretailer.com/confirm If we do not receive a response within 48 hours, your order will be canceled. Regards, Customer Service""",1
 """Dear Taxpayer, You are eligible for a tax refund. To process your refund, please click the link below and fill out the necessary information: http://fakegovernment.com/refund This refund is time-sensitive and must be claimed within the next 7 days. Sincerely, Tax Department""",1
+"Dear user, please verify your account by clicking here.",1
+Meeting at 10 AM tomorrow. Don't forget the report.,0
+Your account has been compromised. Reset your password.,1
+Lunch with Sarah at 1 PM today. See you there!,0
+Your payment has been received. Thank you!,0
+Urgent: Update your payment information immediately.,1
+"Dear Customer, We have noticed suspicious activity on your account and need you to verify your information immediately. Please click the link below to update your account details: http://fakebank.com/verify Failure to do so within 24 hours will result in your account being locked. Thank you, Customer Support",1
+"Hi, We detected a suspicious login attempt to your account from an unknown device. If this was not you, please reset your password immediately to secure your account. Click here to reset your password: http://fakesocialmedia.com/reset If you do not take action, your account may be at risk. Best, The Security Team",1
+"Dear Customer, Thank you for your recent purchase. We need to verify your payment information to process your order. Please confirm your payment details by clicking the link below: http://fakeretailer.com/confirm If we do not receive a response within 48 hours, your order will be canceled. Regards, Customer Service",1
+"Dear Taxpayer, You are eligible for a tax refund. To process your refund, please click the link below and fill out the necessary information: http://fakegovernment.com/refund This refund is time-sensitive and must be claimed within the next 7 days. Sincerely, Tax Department",1
