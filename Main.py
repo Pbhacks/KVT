@@ -46,6 +46,10 @@ class HomeScreen(Screen):
         btn_settings.bind(on_press=self.goto_settings)
         layout.add_widget(btn_settings)
         
+        btn_links = Button(text="Useful Links", size_hint=(1, 0.2))
+        btn_links.bind(on_press=self.goto_links)
+        layout.add_widget(btn_links)
+        
         return layout
 
     def goto_guide(self, instance):
@@ -53,6 +57,9 @@ class HomeScreen(Screen):
         
     def goto_settings(self, instance):
         self.manager.current = 'settings'
+    
+    def goto_links(self, instance):
+        self.manager.current = 'links'
 
 class GuideScreen(Screen):
     def build(self):
@@ -181,6 +188,42 @@ class AntiPhishingVideosScreen(Screen):
     def go_back(self, instance):
         self.manager.current = 'guide'
 
+class LinksScreen(Screen):
+    def build(self):
+        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        
+        # List of links
+        links = [
+            {"title": "Tokyo 2025 Official Site", "url": "https://tokyo2025.jp"},
+            {"title": "Anti-Phishing Resources", "url": "https://antiphishing.org"},
+            {"title": "Cybersecurity Tips", "url": "https://cybersecuritytips.com"}
+        ]
+        
+        scroll_view = ScrollView(size_hint=(1, 1))
+        grid_layout = GridLayout(cols=1, padding=10, spacing=10, size_hint_y=None)
+        grid_layout.bind(minimum_height=grid_layout.setter('height'))
+        
+        for link in links:
+            link_button = Button(text=link["title"], size_hint_y=None, height=40)
+            link_button.bind(on_press=lambda btn, url=link["url"]: self.open_url(url))
+            grid_layout.add_widget(link_button)
+        
+        scroll_view.add_widget(grid_layout)
+        layout.add_widget(scroll_view)
+        
+        back_button = Button(text='Back', size_hint=(1, 0.1))
+        back_button.bind(on_press=self.go_back)
+        layout.add_widget(back_button)
+        
+        return layout
+    
+    def open_url(self, url):
+        import webbrowser
+        webbrowser.open(url)
+    
+    def go_back(self, instance):
+        self.manager.current = 'home'       
+
 class AntiPhishingApp(App):
     def build(self):
         self.title = 'Anti-Phishing App for Tokyo 2025'
@@ -201,6 +244,10 @@ class AntiPhishingApp(App):
         playlist_screen = AntiPhishingVideosScreen(name='playlist')
         playlist_screen.add_widget(playlist_screen.build())
         self.screen_manager.add_widget(playlist_screen)
+        
+        links_screen = LinksScreen(name='links')
+        links_screen.add_widget(links_screen.build())
+        self.screen_manager.add_widget(links_screen)
         
         return self.screen_manager
 
