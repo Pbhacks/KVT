@@ -31,7 +31,7 @@ class HomeScreen(Screen):
         layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
         
         # Logo
-        layout.add_widget(Image(source='assets/tokyo.jpg'))
+        layout.add_widget(Image(source='assets/tokyo.jpg', size_hint=(1, 1), height=300, width=300))
         
         # Welcome Label
         welcome_label = Label(text="Welcome to the Tokyo 2025 Olympics Anti-Phishing App", font_size='20sp')
