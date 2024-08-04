@@ -8,10 +8,11 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.image import Image
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.video import Video
+from kivy.uix.actionbar import ActionBar, ActionView, ActionPrevious, ActionButton
 from plyer import notification
 import joblib
 import re
+import webbrowser
 
 # Load models and preprocessing objects
 vectorizer = joblib.load('model/vectorizer.pkl')
@@ -27,35 +28,79 @@ models = {
 }
 
 class HomeScreen(Screen):
-    def build(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
         
+        # Navigation bar
+        action_bar = ActionBar(pos_hint={'top': 1})
+        action_view = ActionView()
+        
+        action_previous = ActionPrevious(with_previous=False, title="Anti-Phishing App")
+        action_view.add_widget(action_previous)
+        
+        action_drawer = ActionButton(text='Menu')
+        action_drawer.bind(on_press=self.open_drawer)
+        action_view.add_widget(action_drawer)
+        
+        action_bar.add_widget(action_view)
+        layout.add_widget(action_bar)
+        
+        # Main content
+        content_layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        
         # Logo
-        layout.add_widget(Image(source='assets/tokyo.jpg', size_hint=(1, 1), height=300, width=300))
+        content_layout.add_widget(Image(source='assets/tokyo.jpg'))
         
         # Welcome Label
         welcome_label = Label(text="Welcome to the Tokyo 2025 Olympics Anti-Phishing App", font_size='20sp')
-        layout.add_widget(welcome_label)
+        content_layout.add_widget(welcome_label)
         
         # Navigation buttons
         btn_guide = Button(text="Phishing Detection", size_hint=(1, 0.2))
         btn_guide.bind(on_press=self.goto_guide)
-        layout.add_widget(btn_guide)
+        content_layout.add_widget(btn_guide)
         
-        btn_settings = Button(text="Settings", size_hint=(1, 0.2))
-        btn_settings.bind(on_press=self.goto_settings)
-        layout.add_widget(btn_settings)
+        quit_button = Button(text='Quit', size_hint=(1, 0.2))
+        quit_button.bind(on_press=self.on_quit)
+        content_layout.add_widget(quit_button)
         
-        return layout
+        layout.add_widget(content_layout)
+        self.add_widget(layout)
+        
+
+        # Drawer layout
+        self.drawer = BoxLayout(orientation='vertical', size_hint=(0.6, 1), pos_hint={'right': 1})
+        self.drawer.add_widget(Button(text="Settings", size_hint_y=None, height=40, on_press=self.goto_settings))
+        self.drawer.add_widget(Button(text="User Education", size_hint_y=None, height=40, on_press=self.goto_anti_phishing))
+        self.drawer.add_widget(Button(text="Close", size_hint_y=None, height=40, on_press=self.close_drawer))
 
     def goto_guide(self, instance):
         self.manager.current = 'guide'
+
+    def goto_anti(self, instance):
+        self.manager.current = 'playlist'
         
     def goto_settings(self, instance):
         self.manager.current = 'settings'
+        
+    def goto_anti_phishing(self, instance):
+        self.manager.current = 'anti-phishing'
+    
+    def on_quit(self, instance):
+        App.get_running_app().stop()
+    
+    def open_drawer(self, instance):
+        if not self.drawer.parent:
+            self.add_widget(self.drawer)
+    
+    def close_drawer(self, instance):
+        if self.drawer.parent:
+            self.remove_widget(self.drawer)
 
 class GuideScreen(Screen):
-    def build(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
         
         self.email_input = TextInput(hint_text='Paste Email Content Here', multiline=True, size_hint=(1, 0.7))
@@ -69,7 +114,7 @@ class GuideScreen(Screen):
         layout.add_widget(self.result_label)
         
         # Anti-phishing playlist button
-        playlist_button = Button(text='Anti - ph playlist', size_hint=(1, 0.1))
+        playlist_button = Button(text='Anti-phishing playlist', size_hint=(1, 0.1))
         playlist_button.bind(on_press=self.goto_playlist)
         layout.add_widget(playlist_button)
         
@@ -77,7 +122,7 @@ class GuideScreen(Screen):
         back_button.bind(on_press=self.go_back)
         layout.add_widget(back_button)
         
-        return layout
+        self.add_widget(layout)
     
     def analyze_email(self, instance):
         email_content = self.email_input.text
@@ -97,6 +142,7 @@ class GuideScreen(Screen):
         
         if is_phishing or url_phishing:
             self.result_label.text = 'This email is likely a phishing attempt!'
+            notification.notify(title="Phishing Alert", message="Potential phishing email detected!")
         else:
             self.result_label.text = 'This email appears to be safe.'
     
@@ -107,7 +153,8 @@ class GuideScreen(Screen):
         self.manager.current = 'home'
 
 class SettingsScreen(Screen):
-    def build(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
         
         # Automation settings
@@ -122,7 +169,7 @@ class SettingsScreen(Screen):
         back_button.bind(on_press=self.go_back)
         layout.add_widget(back_button)
         
-        return layout
+        self.add_widget(layout)
     
     def toggle_automation(self, instance):
         if self.automation_button.text == "Disabled":
@@ -147,7 +194,8 @@ class SettingsScreen(Screen):
         self.manager.current = 'home'
 
 class AntiPhishingVideosScreen(Screen):
-    def build(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
         
         # List of videos (for demonstration purposes, using simple labels and buttons)
@@ -168,39 +216,144 @@ class AntiPhishingVideosScreen(Screen):
         scroll_view.add_widget(grid_layout)
         layout.add_widget(scroll_view)
         
-        back_button = Button(text='Back', size_hint=(1, 0.1))
+        back_button = Button(text='Back', size_hint=(1, 0.2))
         back_button.bind(on_press=self.go_back)
         layout.add_widget(back_button)
         
-        return layout
+        self.add_widget(layout)
     
     def open_url(self, url):
-        import webbrowser
         webbrowser.open(url)
     
     def go_back(self, instance):
         self.manager.current = 'guide'
 
+class AntiPhishingInfoScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        
+        # Anti-phishing information
+        info_text = (
+            "How to Prevent Phishing Attacks\n\n"
+            "1. **Be Skeptical of Unknown Senders:**\n"
+            "   - Always be cautious when receiving emails or messages from unknown sources. "
+            "   Phishing emails often come from seemingly legitimate addresses but are designed to "
+            "   trick you into revealing sensitive information.\n\n"
+            
+            "2. **Verify Links Before Clicking:**\n"
+            "   - Hover over links to see the actual URL before clicking. If the URL looks suspicious or "
+            "   does not match the content of the message, avoid clicking on it.\n\n"
+            
+            "3. **Avoid Sharing Personal Information:**\n"
+            "   - Do not provide personal or financial information in response to unsolicited requests. "
+            "   Legitimate organizations will never ask for sensitive information via email or text.\n\n"
+            
+            "4. **Use Strong, Unique Passwords:**\n"
+            "   - Use strong passwords for your accounts and avoid reusing passwords across multiple sites. "
+            "   Consider using a password manager to generate and store complex passwords.\n\n"
+            
+            "5. **Enable Two-Factor Authentication (2FA):**\n"
+            "   - Enable 2FA on your accounts when available. This adds an extra layer of security by requiring "
+            "   a second form of verification in addition to your password.\n\n"
+            
+            "6. **Keep Software Updated:**\n"
+            "   - Regularly update your operating system, browsers, and applications to ensure you have the latest "
+            "   security patches and fixes.\n\n"
+            
+            "7. **Educate Yourself and Others:**\n"
+            "   - Stay informed about the latest phishing tactics and educate those around you about how to recognize "
+            "   and avoid phishing attempts.\n\n"
+            
+            "8. **Report Suspicious Activity:**\n"
+            "   - If you receive a suspicious email or message, report it to your email provider or the relevant authority. "
+            "   Many organizations have dedicated channels for reporting phishing attempts.\n\n"
+            
+            "9. **Be Wary of Urgent or Threatening Language:**\n"
+            "   - Phishing emails often use urgent or threatening language to create a sense of panic and compel you to act quickly. "
+            "   Take a moment to consider if the message is legitimate before responding.\n\n"
+            
+            "10. **Check for Grammar and Spelling Errors:**\n"
+            "    - Many phishing emails contain grammar and spelling mistakes. While not all suspicious emails have these errors, "
+            "    their presence can be a red flag.\n\n"
+            
+            "11. **Look for Generic Greetings:**\n"
+            "    - Legitimate organizations usually address you by your name. Be cautious if the email uses generic greetings like "
+            "    'Dear Customer' or 'Dear User'.\n\n"
+            
+            "12. **Don't Download Attachments from Unknown Sources:**\n"
+            "    - Avoid downloading attachments from unknown or unexpected sources. They may contain malware that can compromise your system.\n\n"
+            
+            "13. **Secure Your Wi-Fi Network:**\n"
+            "    - Ensure your home or office Wi-Fi network is secure with a strong password to prevent unauthorized access. "
+            "    Avoid using public Wi-Fi for accessing sensitive information.\n\n"
+            
+            "14. **Use Antivirus and Anti-Malware Software:**\n"
+            "    - Install and regularly update antivirus and anti-malware software to protect your devices from malicious attacks.\n\n"
+            
+            "15. **Be Cautious with Pop-Ups:**\n"
+            "    - Be wary of pop-up windows asking for personal information or urging you to download software. Legitimate organizations "
+            "    typically do not request sensitive information this way.\n\n"
+            
+            "16. **Verify the Source:**\n"
+            "    - If you receive an email or message that seems suspicious but appears to come from a known source, contact the organization "
+            "    directly using contact information from their official website, not the contact details provided in the message.\n\n"
+            
+            "17. **Use Browser Filters:**\n"
+            "    - Enable browser filters to help detect and block known phishing websites. Most modern browsers have built-in features to alert you to phishing attempts.\n\n"
+            
+            "18. **Be Aware of Spear Phishing:**\n"
+            "    - Spear phishing targets specific individuals or organizations. These attacks are often more sophisticated and personalized. "
+            "    Be extra cautious if you receive an unexpected email or message that appears to be highly personalized.\n\n"
+            
+            "19. **Regularly Monitor Your Accounts:**\n"
+            "    - Regularly check your bank and credit card statements for any unauthorized transactions. Report any suspicious activity immediately.\n\n"
+            
+            "20. **Stay Informed About Security Practices:**\n"
+            "    - Keep yourself updated with the latest security practices and phishing trends. Awareness and knowledge are key defenses against phishing attacks.\n\n"
+            
+            "By following these best practices, you can help protect yourself from falling victim to phishing attacks."
+        )
+
+        # Add information as a label
+        info_label = Label(text=info_text, font_size='12sp', halign='left', valign='top', size_hint_y=None)
+        info_label.bind(size=info_label.setter('text_size'))
+        
+        # Set the height of the label to be based on its content
+        info_label.bind(texture_size=info_label.setter('size'))
+        
+        scroll_view = ScrollView()
+        scroll_view.add_widget(info_label)
+        
+        layout.add_widget(scroll_view)
+        
+        back_button = Button(text='Back', size_hint=(1, 0.1))
+        back_button.bind(on_press=self.go_back)
+        layout.add_widget(back_button)
+        
+        self.add_widget(layout)
+    
+    def go_back(self, instance):
+        self.manager.current = 'home'
 class AntiPhishingApp(App):
     def build(self):
         self.title = 'Anti-Phishing App for Tokyo 2025'
         self.screen_manager = ScreenManager()
         
         home_screen = HomeScreen(name='home')
-        home_screen.add_widget(home_screen.build())
         self.screen_manager.add_widget(home_screen)
         
         guide_screen = GuideScreen(name='guide')
-        guide_screen.add_widget(guide_screen.build())
         self.screen_manager.add_widget(guide_screen)
         
         settings_screen = SettingsScreen(name='settings')
-        settings_screen.add_widget(settings_screen.build())
         self.screen_manager.add_widget(settings_screen)
         
         playlist_screen = AntiPhishingVideosScreen(name='playlist')
-        playlist_screen.add_widget(playlist_screen.build())
         self.screen_manager.add_widget(playlist_screen)
+        
+        anti_phishing_info_screen = AntiPhishingInfoScreen(name='anti-phishing')
+        self.screen_manager.add_widget(anti_phishing_info_screen)
         
         return self.screen_manager
 
