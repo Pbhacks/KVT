@@ -1,4 +1,3 @@
-import kivy
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -8,11 +7,9 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.image import Image
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.actionbar import ActionBar, ActionView, ActionPrevious, ActionButton
 from plyer import notification
 import joblib
 import re
-import webbrowser
 
 # Load models and preprocessing objects
 vectorizer = joblib.load('model/vectorizer.pkl')
@@ -32,25 +29,11 @@ class HomeScreen(Screen):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
         
-        # Navigation bar
-        action_bar = ActionBar(pos_hint={'top': 1})
-        action_view = ActionView()
-        
-        action_previous = ActionPrevious(with_previous=False, title="Anti-Phishing App")
-        action_view.add_widget(action_previous)
-        
-        action_drawer = ActionButton(text='Menu')
-        action_drawer.bind(on_press=self.open_drawer)
-        action_view.add_widget(action_drawer)
-        
-        action_bar.add_widget(action_view)
-        layout.add_widget(action_bar)
-        
         # Main content
         content_layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
         
         # Logo
-        content_layout.add_widget(Image(source='assets/tokyo.jpg'))
+        layout.add_widget(Image(source='assets/tokyo.jpg', size_hint=(1, 1), height=300, width=300))
         
         # Welcome Label
         welcome_label = Label(text="Welcome to the Tokyo 2025 Olympics Anti-Phishing App", font_size='20sp')
@@ -61,43 +44,47 @@ class HomeScreen(Screen):
         btn_guide.bind(on_press=self.goto_guide)
         content_layout.add_widget(btn_guide)
         
-        quit_button = Button(text='Quit', size_hint=(1, 0.2))
-        quit_button.bind(on_press=self.on_quit)
-        content_layout.add_widget(quit_button)
+        
         
         layout.add_widget(content_layout)
         self.add_widget(layout)
-        
-
-        # Drawer layout
-        self.drawer = BoxLayout(orientation='vertical', size_hint=(0.6, 1), pos_hint={'right': 1})
-        self.drawer.add_widget(Button(text="Settings", size_hint_y=None, height=40, on_press=self.goto_settings))
-        self.drawer.add_widget(Button(text="User Education", size_hint_y=None, height=40, on_press=self.goto_anti_phishing))
-        self.drawer.add_widget(Button(text="Close", size_hint_y=None, height=40, on_press=self.close_drawer))
-
+    
     def goto_guide(self, instance):
         self.manager.current = 'guide'
 
-    def goto_anti(self, instance):
-        self.manager.current = 'playlist'
+    def on_quit(self, instance):
+        App.get_running_app().stop()
+
+class MenuScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+
+        # Add the image to the layout
+        layout.add_widget(Image(source='assets/tokyo1.jpeg', size_hint=(1, 1), height=300, width=300))
         
+        # Add buttons for different menu options
+        btn_settings = Button(text="Settings", size_hint_y=None, height=40, on_press=self.goto_settings)
+        btn_user_education = Button(text="User Education", size_hint_y=None, height=40, on_press=self.goto_anti_phishing)
+        btn_quit = Button(text="Quit", size_hint_y=None, height=40, on_press=self.on_quit)
+        
+        layout.add_widget(btn_settings)
+        layout.add_widget(btn_user_education)
+        layout.add_widget(btn_quit)
+        
+        self.add_widget(layout)
+
     def goto_settings(self, instance):
         self.manager.current = 'settings'
         
     def goto_anti_phishing(self, instance):
         self.manager.current = 'anti-phishing'
+
+    def go_back(self, instance):
+        self.manager.current = 'home'
     
     def on_quit(self, instance):
         App.get_running_app().stop()
-    
-    def open_drawer(self, instance):
-        if not self.drawer.parent:
-            self.add_widget(self.drawer)
-    
-    def close_drawer(self, instance):
-        if self.drawer.parent:
-            self.remove_widget(self.drawer)
-
 class GuideScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -112,11 +99,6 @@ class GuideScreen(Screen):
         
         self.result_label = Label(text='', size_hint=(1, 0.1))
         layout.add_widget(self.result_label)
-        
-        # Anti-phishing playlist button
-        playlist_button = Button(text='Anti-phishing playlist', size_hint=(1, 0.1))
-        playlist_button.bind(on_press=self.goto_playlist)
-        layout.add_widget(playlist_button)
         
         back_button = Button(text='Back', size_hint=(1, 0.1))
         back_button.bind(on_press=self.go_back)
@@ -145,9 +127,6 @@ class GuideScreen(Screen):
             notification.notify(title="Phishing Alert", message="Potential phishing email detected!")
         else:
             self.result_label.text = 'This email appears to be safe.'
-    
-    def goto_playlist(self, instance):
-        self.manager.current = 'playlist'
     
     def go_back(self, instance):
         self.manager.current = 'home'
@@ -192,41 +171,6 @@ class SettingsScreen(Screen):
     
     def go_back(self, instance):
         self.manager.current = 'home'
-
-class AntiPhishingVideosScreen(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
-        
-        # List of videos (for demonstration purposes, using simple labels and buttons)
-        videos = [
-            {"title": "Understanding Phishing Attacks", "url": "https://youtu.be/XBkzBrXlle0"},
-            {"title": "How to Recognize Phishing Emails", "url": "https://youtu.be/o0btqyGWIQw"}
-        ]
-        
-        scroll_view = ScrollView(size_hint=(1, 1))
-        grid_layout = GridLayout(cols=1, padding=10, spacing=10, size_hint_y=None)
-        grid_layout.bind(minimum_height=grid_layout.setter('height'))
-        
-        for video in videos:
-            video_button = Button(text=video["title"], size_hint_y=None, height=40)
-            video_button.bind(on_press=lambda btn, url=video["url"]: self.open_url(url))
-            grid_layout.add_widget(video_button)
-        
-        scroll_view.add_widget(grid_layout)
-        layout.add_widget(scroll_view)
-        
-        back_button = Button(text='Back', size_hint=(1, 0.2))
-        back_button.bind(on_press=self.go_back)
-        layout.add_widget(back_button)
-        
-        self.add_widget(layout)
-    
-    def open_url(self, url):
-        webbrowser.open(url)
-    
-    def go_back(self, instance):
-        self.manager.current = 'guide'
 
 class AntiPhishingInfoScreen(Screen):
     def __init__(self, **kwargs):
@@ -335,27 +279,54 @@ class AntiPhishingInfoScreen(Screen):
     
     def go_back(self, instance):
         self.manager.current = 'home'
+
+class BottomNavBar(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'horizontal'
+        self.size_hint_y = 0.1
+
+        home_button = Button(text='Home')
+        home_button.bind(on_press=self.goto_home)
+        self.add_widget(home_button)
+
+        menu_button = Button(text='Menu')
+        menu_button.bind(on_press=self.goto_menu)
+        self.add_widget(menu_button)
+
+    def goto_home(self, instance):
+        App.get_running_app().screen_manager.current = 'home'
+
+    def goto_menu(self, instance):
+        App.get_running_app().screen_manager.current = 'menu'
+
 class AntiPhishingApp(App):
     def build(self):
-        self.title = 'Anti-Phishing App for Tokyo 2025'
+        self.icon = 'assets/olympics_logo.jpg'
+        self.title = 'Tokyo 2025 Olympics Anti-Phishing App'
+
         self.screen_manager = ScreenManager()
-        
-        home_screen = HomeScreen(name='home')
-        self.screen_manager.add_widget(home_screen)
-        
-        guide_screen = GuideScreen(name='guide')
-        self.screen_manager.add_widget(guide_screen)
-        
-        settings_screen = SettingsScreen(name='settings')
-        self.screen_manager.add_widget(settings_screen)
-        
-        playlist_screen = AntiPhishingVideosScreen(name='playlist')
-        self.screen_manager.add_widget(playlist_screen)
-        
-        anti_phishing_info_screen = AntiPhishingInfoScreen(name='anti-phishing')
-        self.screen_manager.add_widget(anti_phishing_info_screen)
-        
-        return self.screen_manager
+
+        self.home_screen = HomeScreen(name='home')
+        self.screen_manager.add_widget(self.home_screen)
+
+        self.menu_screen = MenuScreen(name='menu')
+        self.screen_manager.add_widget(self.menu_screen)
+
+        self.guide_screen = GuideScreen(name='guide')
+        self.screen_manager.add_widget(self.guide_screen)
+
+        self.settings_screen = SettingsScreen(name='settings')
+        self.screen_manager.add_widget(self.settings_screen)
+
+        self.anti_phishing_info_screen = AntiPhishingInfoScreen(name='anti-phishing')
+        self.screen_manager.add_widget(self.anti_phishing_info_screen)
+
+        main_layout = BoxLayout(orientation='vertical')
+        main_layout.add_widget(self.screen_manager)
+        main_layout.add_widget(BottomNavBar())
+
+        return main_layout
 
 if __name__ == '__main__':
     AntiPhishingApp().run()
