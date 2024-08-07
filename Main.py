@@ -137,6 +137,10 @@ class SettingsScreen(Screen):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
         
+        self.image = Image(source='assets/settingsbg.jpg', allow_stretch=True)
+        self.image.size_hint = (1, 1)
+        layout.add_widget(self.image)
+
         # Automation settings
         automation_label = Label(text="Enable Automation", size_hint=(1, 0.2))
         layout.add_widget(automation_label)
