@@ -180,88 +180,88 @@ class AntiPhishingInfoScreen(Screen):
         
         # Anti-phishing information
         info_text = (
-            "How to Prevent Phishing Attacks!?\n\n"
-            "1. Be Skeptical of Unknown Senders:\n"
+            "[b][size=24]How to Prevent Phishing Attacks!?[/size][/b]\n\n"
+            "[size=18]1. Be Skeptical of Unknown Senders:[/size]\n"
             "   - Always be cautious when receiving emails or messages from unknown sources. "
             "   Phishing emails often come from seemingly legitimate addresses but are designed to "
             "   trick you into revealing sensitive information.\n\n"
             
-            "2. Verify Links Before Clicking:\n"
+            "[size=18]2. Verify Links Before Clicking:[/size]\n"
             "   - Hover over links to see the actual URL before clicking. If the URL looks suspicious or "
             "   does not match the content of the message, avoid clicking on it.\n\n"
             
-            "3. Avoid Sharing Personal Information:\n"
+            "[size=18]3. Avoid Sharing Personal Information:[/size]\n"
             "   - Do not provide personal or financial information in response to unsolicited requests. "
             "   Legitimate organizations will never ask for sensitive information via email or text.\n\n"
             
-            "4. Use Strong, Unique Passwords:\n"
+            "[size=18]4. Use Strong, Unique Passwords:[/size]\n"
             "   - Use strong passwords for your accounts and avoid reusing passwords across multiple sites. "
             "   Consider using a password manager to generate and store complex passwords.\n\n"
             
-            "5. Enable Two-Factor Authentication (2FA):\n"
+            "[size=18]5. Enable Two-Factor Authentication (2FA):[/size]\n"
             "   - Enable 2FA on your accounts when available. This adds an extra layer of security by requiring "
             "   a second form of verification in addition to your password.\n\n"
             
-            "6. Keep Software Updated:\n"
+            "[size=18]6. Keep Software Updated:[/size]\n"
             "   - Regularly update your operating system, browsers, and applications to ensure you have the latest "
             "   security patches and fixes.\n\n"
             
-            "7. Educate Yourself and Others:\n"
+            "[size=18]7. Educate Yourself and Others:[/size]\n"
             "   - Stay informed about the latest phishing tactics and educate those around you about how to recognize "
             "   and avoid phishing attempts.\n\n"
             
-            "8. Report Suspicious Activity:\n"
+            "[size=18]8. Report Suspicious Activity:[/size]\n"
             "   - If you receive a suspicious email or message, report it to your email provider or the relevant authority. "
             "   Many organizations have dedicated channels for reporting phishing attempts.\n\n"
             
-            "9. Be Wary of Urgent or Threatening Language:\n"
+            "[size=18]9. Be Wary of Urgent or Threatening Language:[/size]\n"
             "   - Phishing emails often use urgent or threatening language to create a sense of panic and compel you to act quickly. "
             "   Take a moment to consider if the message is legitimate before responding.\n\n"
             
-            "10. Check for Grammar and Spelling Errors:\n"
+            "[size=18]10. Check for Grammar and Spelling Errors:[/size]\n"
             "    - Many phishing emails contain grammar and spelling mistakes. While not all suspicious emails have these errors, "
             "    their presence can be a red flag.\n\n"
             
-            "11. Look for Generic Greetings:\n"
+            "[size=18]11. Look for Generic Greetings:[/size]\n"
             "    - Legitimate organizations usually address you by your name. Be cautious if the email uses generic greetings like "
             "    'Dear Customer' or 'Dear User'.\n\n"
             
-            "12. Don't Download Attachments from Unknown Sources:\n"
+            "[size=18]12. Don't Download Attachments from Unknown Sources:[/size]\n"
             "    - Avoid downloading attachments from unknown or unexpected sources. They may contain malware that can compromise your system.\n\n"
             
-            "13. Secure Your Wi-Fi Network:\n"
+            "[size=18]13. Secure Your Wi-Fi Network:[/size]\n"
             "    - Ensure your home or office Wi-Fi network is secure with a strong password to prevent unauthorized access. "
             "    Avoid using public Wi-Fi for accessing sensitive information.\n\n"
             
-            "14. Use Antivirus and Anti-Malware Software:\n"
+            "[size=18]14. Use Antivirus and Anti-Malware Software:[/size]\n"
             "    - Install and regularly update antivirus and anti-malware software to protect your devices from malicious attacks.\n\n"
             
-            "15. Be Cautious with Pop-Ups:\n"
+            "[size=18]15. Be Cautious with Pop-Ups:[/size]\n"
             "    - Be wary of pop-up windows asking for personal information or urging you to download software. Legitimate organizations "
             "    typically do not request sensitive information this way.\n\n"
             
-            "16. Verify the Source:\n"
+            "[size=18]16. Verify the Source:[/size]\n"
             "    - If you receive an email or message that seems suspicious but appears to come from a known source, contact the organization "
             "    directly using contact information from their official website, not the contact details provided in the message.\n\n"
             
-            "17. Use Browser Filters:\n"
+            "[size=18]17. Use Browser Filters:[/size]\n"
             "    - Enable browser filters to help detect and block known phishing websites. Most modern browsers have built-in features to alert you to phishing attempts.\n\n"
             
-            "18. Be Aware of Spear Phishing:\n"
+            "[size=18]18. Be Aware of Spear Phishing:[/size]\n"
             "    - Spear phishing targets specific individuals or organizations. These attacks are often more sophisticated and personalized. "
             "    Be extra cautious if you receive an unexpected email or message that appears to be highly personalized.\n\n"
             
-            "19. Regularly Monitor Your Accounts:\n"
+            "[size=18]19. Regularly Monitor Your Accounts:[/size]\n"
             "    - Regularly check your bank and credit card statements for any unauthorized transactions. Report any suspicious activity immediately.\n\n"
             
-            "20. Stay Informed About Security Practices:\n"
+            "[size=18]20. Stay Informed About Security Practices:[/size]\n"
             "    - Keep yourself updated with the latest security practices and phishing trends. Awareness and knowledge are key defenses against phishing attacks.\n\n"
             
-            "By following these best practices, you can help protect yourself from falling victim to phishing attacks."
+            "[size=18]By following these best practices, you can help protect yourself from falling victim to phishing attacks.[/size]"
         )
 
-        # Add information as a label
-        info_label = Label(text=info_text, font_size='12sp', halign='left', valign='top', size_hint_y=None)
+        # Add information as a label with markup enabled
+        info_label = Label(text=info_text, font_size='12sp', halign='left', valign='top', size_hint_y=None, markup=True)
         info_label.bind(size=info_label.setter('text_size'))
         
         # Set the height of the label to be based on its content
